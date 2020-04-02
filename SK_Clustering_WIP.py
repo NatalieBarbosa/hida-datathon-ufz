@@ -8,13 +8,13 @@ from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import xarray as xr
 import pandas as pd
-import cartopy.crs as ccrs
+#import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 
 say_hello()
 
 # set a path to the directory containing the data
-directory = "D:\HIDA-Datathon-UFZ\hida-datathon-ufz\data"
+directory = "/Users/houben/phd/hackathons/hida_datathon/data/MyChallengePaleo"
 # set the file names
 filename_temp_data_r1 = "T2m_R1_ym_1stMill.nc"
 filename_temp_data_r2 = "T2m_R2_ym_1stMill.nc"
@@ -41,6 +41,7 @@ from sklearn.cluster import KMeans
 kmeans = KMeans(n_clusters = 5)
 X = Var_frommean.to_numpy().reshape(-1,1)
 kmeans.fit(X)
+kmeans.cluster_centers_
 print("Cluster memberships:\n{}".format(kmeans.labels_))
 classes = kmeans.predict(X)
 dip = np.argwhere(classes==4)
@@ -52,7 +53,7 @@ import mglearn
 mglearn.discrete_scatter(X, X, kmeans.labels_, markers='o')
 mglearn.discrete_scatter(kmeans.cluster_centers_, kmeans.cluster_centers_, [0,1,2], markers='^', markeredgewidth=2)
 
-X = r1_df.loc[r1_df.time < 30]
+X = df_r1.loc[df_r1.time < 30]
 kmeans.fit(X["T2m"].to_numpy().reshape(-1,1))
 mglearn.discrete_scatter(X["lon"], X["lat"], kmeans.labels_, markers='o')
 mglearn.discrete_scatter(kmeans.cluster_centers_[:,0], kmeans.cluster_centers_[:,1], [0,1,2], markers='^', markeredgewidth=2)

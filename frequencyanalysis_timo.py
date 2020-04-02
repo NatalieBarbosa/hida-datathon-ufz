@@ -7,6 +7,8 @@ from frequencyanalysis.power_spectrum import power_spectrum
 from frequencyanalysis.plot import plot_spectrum
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.fftpack as fftpack
+import scipy.signal as signal
 
 # path for output plot
 path = "/Users/houben/phd/hackathons/hida_datathon/repos/hida-datathon-ufz/frequencyanalysis_output"
@@ -113,3 +115,151 @@ for ax, case, case_l, case_u in zip(axs, cases, cases_l, cases_u):
     ax.set_ylim(1e-3, 1e3)
 #ax.set_title("Power Spectral Density of T2m for R1 model. \n Aggregated for different latitudes")
 plt.savefig(path + "/R2_R1_temp_spectral_density.png", dpi=300)
+
+## filter out the solar activity: or a frequency of x years
+global_mean_ts_r1 = np.mean(temp_r1, axis=(1,2))
+global_mean_ts_r1_anom = global_mean_ts_r1 - np.mean(global_mean_ts_r1)
+
+spectrum = fftpack.fft(global_mean_ts_r1_anom)
+len_input = len(global_mean_ts_r1_anom)
+frequency = fftpack.fftfreq(len_input, time_step_size)
+
+# define min and max frequency in years
+min_freq = 1 / (365*86400*5)
+max_freq = 1 / (365*86400*12)
+
+
+
+# Bandstop filter - Does not work
+from scipy.signal import butter, lfilter
+def butter_bandstop(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='highpass')
+    return b, a
+
+def butter_bandstop_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+global_mean_ts_r1_anom_filtered = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=5)
+plt.plot(global_mean_ts_r1_anom)
+plt.plot(global_mean_ts_r1_anom_filtered)
+
+
+# Bandpass filter - works (I think)
+from scipy.signal import butter, lfilter
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+global_mean_ts_r1_anom_filtered = butter_bandpass_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=5)
+plt.plot(global_mean_ts_r1_anom)
+plt.plot(global_mean_ts_r1_anom_filtered)
+
+
+
+# pop first value of frequency since it's zero and all negative frequencies
+# frequency_half = frequency[1:int((len(frequency)+1)/2)]
+#
+# frequency_cut = (frequency_half < min_freq) & (frequency_half > max_freq)
+# fre ...
+# np.fft.ifft(spectrum)
+# plt.plot(np.fft.ifft(spectrum))
+
+
+#
+# def run():
+#     import numpy as np
+#     import matplotlib.pyplot as plt
+#     from scipy.signal import freqz
+#
+#     # Sample rate and desired cutoff frequencies (in Hz).
+#     fs = time_step_size
+#     lowcut = min_freq
+#     highcut = max_freq
+#
+#     # Plot the frequency response for a few different orders.
+#     plt.figure(1)
+#     plt.clf()
+#     for order in [3, 6, 9]:
+#         b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+#         w, h = freqz(b, a, worN=2000)
+#         plt.plot((fs * 0.5 / np.pi) * w, abs(h), label="order = %d" % order)
+#
+#     plt.plot([0, 0.5 * fs], [np.sqrt(0.5), np.sqrt(0.5)],
+#              '--', label='sqrt(0.5)')
+#     plt.xlabel('Frequency (Hz)')
+#     plt.ylabel('Gain')
+#     plt.grid(True)
+#     plt.legend(loc='best')
+#
+#     # Filter a noisy signal.
+#     T = 0.05
+#     nsamples = T * fs
+#     t = np.linspace(0, T, nsamples, endpoint=False)
+#     a = 0.02
+#     f0 = 600.0
+#     x = 0.1 * np.sin(2 * np.pi * 1.2 * np.sqrt(t))
+#     x += 0.01 * np.cos(2 * np.pi * 312 * t + 0.1)
+#     x += a * np.cos(2 * np.pi * f0 * t + .11)
+#     x += 0.03 * np.cos(2 * np.pi * 2000 * t)
+#     plt.figure(2)
+#     plt.clf()
+#     plt.plot(t, x, label='Noisy signal')
+#
+#     print(np.shape(x))
+#
+#     y = butter_bandpass_filter(x, lowcut, highcut, fs, order=6)
+#     plt.plot(t, y, label='Filtered signal (%g Hz)' % f0)
+#     plt.xlabel('time (seconds)')
+#     plt.hlines([-a, a], 0, T, linestyles='--')
+#     plt.grid(True)
+#     plt.axis('tight')
+#     plt.legend(loc='upper left')
+#
+#     plt.show()
+#
+# run()
+
+
+
+#
+# n = 61
+# a = signal.firwin(n, cutoff = 0.3, window = "hamming")
+# #Frequency and phase response
+# mfreqz(a)
+# show()
+# #Impulse and step response
+# figure(2)
+# impz(a)
+# show()
+#
+#
+# spectrum = abs(spectrum[: int(round(len(spectrum) / 2))]) ** 2
+# power_spectrum_input = spectrum[1:]
+# spectrum = fftpack.fft(output)
+# spectrum = abs(spectrum[: int(round(len(spectrum) / 2))]) ** 2
+# power_spectrum_output = spectrum[1:]
+# if len_input == len_output:
+#     power_spectrum_result = power_spectrum_output / power_spectrum_input
+# frequency_input = (
+#     abs(fftpack.fftfreq(len_input, time_step_size))[
+#         : int(round(len_input / 2))
+#     ]
+# )[1:]
+# frequency_output = (
+#     abs(fftpack.fftfreq(len_output, time_step_size))[
+#         : int(round(len_output / 2))
+#     ]
+# )[1:]
