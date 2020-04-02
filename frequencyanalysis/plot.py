@@ -20,6 +20,7 @@ def plot_spectrum(
     heading="None",
     figtxt=None,
     comment="",
+    **kwargs
 ):
     """
     Function to plot one or multiple power spectra.
@@ -67,7 +68,7 @@ def plot_spectrum(
     font = {"family": "DejaVu Sans", "weight": "normal", "size": 20}
     plt.rc("font", **font)
     plt.rc("legend", fontsize=15)
-    plt.figure(figsize=[20, 10], dpi=300)
+    plt.figure(figsize=[20, 10], dpi=200)
     if np.ndim(data) == 1:
         plt.loglog(
             frequency,
