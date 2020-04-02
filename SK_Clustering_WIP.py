@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import mglearn
 
-say_hello()
+#say_hello()
 
 # set a path to the directory containing the data
 directory = "/Users/houben/phd/hackathons/hida_datathon/data/MyChallengePaleo"
