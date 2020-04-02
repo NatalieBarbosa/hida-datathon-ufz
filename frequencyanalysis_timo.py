@@ -16,7 +16,7 @@ time_step_size = 365*86400
 directory = "/Users/houben/phd/hackathons/hida_datathon/data/MyChallengePaleo"
 # set the file names
 filename_temp_data_r1 = "T2m_R1_ym_1stMill.nc"
-filename_temp_data_r2 = "T2m_R1_ym_1stMill.nc"
+filename_temp_data_r2 = "T2m_R2_ym_1stMill.nc"
 # Load input files
 temp_data_r1 = netCDF4.Dataset(osp.join(directory, filename_temp_data_r1), "r")
 temp_data_r2 = netCDF4.Dataset(osp.join(directory, filename_temp_data_r2), "r")
@@ -106,7 +106,10 @@ for ax, case, case_l, case_u in zip(axs, cases, cases_l, cases_u):
     ax.set_xlabel("Frequency [Hz]")
     tempslice_r1 = temp_r1[:, (lat > case_l) & (lat < case_u), :]
     tempslice_r1_mean = np.mean(tempslice_r1, axis=(1,2))
-    frequency, spectrum = power_spectrum(tempslice_r1_mean, tempslice_r1_mean, time_step_size, method="scipyperio", o_i="i")
+    tempslice_r2 = temp_r2[:, (lat > case_l) & (lat < case_u), :]
+    tempslice_r2_mean = np.mean(tempslice_r2, axis=(1,2))
+    frequency, spectrum = power_spectrum(tempslice_r2_mean, tempslice_r1_mean, time_step_size, method="scipyperio", o_i="oi")
     ax.plot(frequency, spectrum, ls='-', ms=4)
+    ax.set_ylim(1e-3, 1e3)
 #ax.set_title("Power Spectral Density of T2m for R1 model. \n Aggregated for different latitudes")
-plt.savefig(path + "R1_temp.png", dpi=300)
+plt.savefig(path + "/R2_R1_temp_spectral_density.png", dpi=300)
