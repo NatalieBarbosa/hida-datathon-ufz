@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os.path as osp
 #import netCDF4
 #from netcdf_helpers.reader import say_hello, get_time_series_from_location
@@ -63,16 +64,40 @@ len(dipinyear)
 
 shortlistedtimeseries = list(timelist[i][0] for i in dip)
 
+#fourth column to group locations:
+#df_r1['latlon'] = df_r1[['lat', 'lon']].apply(lambda x: ','.join(x.astype(str)), axis=1)
+#the above step takes too long. look for alternatives. ALternatively, go for the original dataset
+#locationmean = df_r1.groupby('latlon').mean()
+locationmean = df_r1.groupby(['lat','lon']).mean() #testing alternative to above, much shorter
+locationmean["mean"] = locationmean["T2m"]
+df_r1_locmean = pd.merge(df_r1, locationmean[['T2m']], on = ['lat','lon']).rename(columns={'T2m_y':'mean'}) #merging the two dataframes
+df_r1_locmean["Var"] = df_r1_locmean["T2m_x"] - df_r1_locmean["mean"] #calculating variation from mean of time series at respective location
+
 #Filter the dataset and look at only the years which have the biggest dips for the data analysis/image analysis
 #Also divide it into 6 zones as previously discussed: tropical, temperate and polar in northern and southern hemispheres
-df_r1_time = df_r1[df_r1.time.isin(shortlistedtimeseries)]
-df_North = df_r1[df_r1.lat>0]
-df_North_trop = df_North[df_North.lat<30]
-df_North_nottrop = df_North[df_North.lat>30]
-df_North_temp = df_North_nottrop[df_North_nottrop.lat<60]
-df_North_polar = df_North_nottrop[df_North_nottrop.lat>60]
-df_South = df_r1[df_r1.lat<0]
-df_South_trop = df_South[df_South.lat>-30]
-df_South_nottrop = df_South[df_South.lat<-30]
-df_South_temp = df_South_nottrop[df_South_nottrop.lat>-60]
-df_South_polar = df_South_nottrop[df_South_nottrop.lat<-60]
+df_r1_time = df_r1_locmean[df_r1_locmean.time.isin(shortlistedtimeseries)]
+df_North_trop = df_r1[(df_r1.lat>=0) & (df_r1.lat<30)]
+df_North_temp = df_r1[(df_r1.lat>=30) & (df_r1.lat<60)]
+df_North_polar = df_r1[df_r1.lat>=60]
+df_South_trop = df_r1[(df_r1.lat>=-30) & (df_r1.lat<0)]
+df_South_temp = df_r1[(df_r1.lat>=-60) & (df_r1.lat<-30)]
+df_South_polar = df_r1[df_r1.lat<-60]
+
+#Taking snapshots of years of interest: this needs to be broadened to consider the 5 year rolling window I think
+kmeans = KMeans(n_clusters = 3)
+for t in shortlistedtimeseries[:5]:
+    Y = df_r1_time[df_r1_time['time']==t]
+    series = Y["Var"]
+    X = series.to_numpy().reshape(-1,1)
+#    X = Var_frommean.to_numpy().reshape(-1,1)
+    kmeans.fit(X)
+#    print("Cluster memberships:\n{}".format(kmeans.labels_))
+    #Assign classes to each data point based on the model
+    classes = kmeans.predict(X)
+    Y["labels"] = classes
+    Y["plotlabels"] = kmeans.cluster_centers_[Y["labels"]] #To label the location with the corresponding cluster centroid
+#    print(kmeans.cluster_centers_)
+    plt.figure()
+    mglearn.discrete_scatter(Y['lon'], Y['lat'], Y["plotlabels"], markers='o')
+    plt.title("Year: "+str(int(t/10000)))
+    plt.legend()
