@@ -2,5 +2,6 @@
 
 # Requirements
 
--numpy
--netCDF4
+- numpy
+- netCDF4
+- scipy

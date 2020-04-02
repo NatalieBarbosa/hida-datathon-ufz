@@ -4,6 +4,8 @@ __pycache__
 .ipynb_checkpoints
 # Mac OS
 .DS_Store
+timo.py
+frequencyanalysis_output
 
 # Put your own test folder/files here which should not appear on remote git
 # Adding the data folder
