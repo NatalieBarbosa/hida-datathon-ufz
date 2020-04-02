@@ -24,7 +24,7 @@ temp_data_r2.variables.keys()
 
 # assign temp to a variable
 temp_r1 = temp_data_r1.variables["T2m"]
-temp_r2 = temp_data_r1.variables["T2m"]
+temp_r2 = temp_data_r2.variables["T2m"]
 
 # List the dimensions
 for dim in temp_data_r1.dimensions.items():
