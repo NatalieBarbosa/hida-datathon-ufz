@@ -43,20 +43,20 @@ def get_time_series_from_location(data, var_name, lat_target, lon_target):
 
     def getclosest_ij(latarray,longarray,lat_target,long_target):
         # find squared distance of every point on grid
-        leastdist = 1000000
+        leastdist = 1000000 #initial random value
         latindx = np.arange(0,len(latarray),1)
         lonindx = np.arange(0,len(longarray),1)
         for y,x in zip(latindx, lonindx):
-            dist_sq = (latarray[y]-lat_target)**2 + (longarray[x]-long_target)**2
+            dist_sq = (latarray[y]-lat_target)**2 + (longarray[x]-long_target)**2 #calculate square of distance
 #            print(dist_sq)
-            dist_sq_old = dist_sq
-            if dist_sq < leastdist or dist_sq < dist_sq_old:
+            dist_sq_old = dist_sq #move to another variable to enable comparison wiht next calculation
+            if dist_sq < leastdist or dist_sq < dist_sq_old: #if the new value is less than old calculation or the least distance calculated so far
                 leastdist = dist_sq
                 leastlatidx = y
                 leastlongidx = x
-                leastdist = dist_sq
+                leastdist = dist_sq #then save the indices associated with this least value of distance
 #                print(leastdist, latarray[y], longarray[x])  
-        print ("The closes coordinates are: "+ str(leastdist)+ " meters away")
+        print ("The closest coordinates are: "+ str(leastdist)+ " meters away")
         return leastlatidx, leastlongidx
     # get the index for target point
 #    lat_indx_target = near(lat, lat_target)
