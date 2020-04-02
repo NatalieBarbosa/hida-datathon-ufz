@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_time_series_for_locations(time_series_list, time, names):
+def plot_time_series_for_locations(time_series_list, time, names, **kwargs):
     """
     Parameters
     ----------
@@ -21,6 +21,6 @@ def plot_time_series_for_locations(time_series_list, time, names):
     """
 
     for time_series, name in zip(time_series_list, names):
-        plt.plot(time, time_series, label=name)
+        plt.plot(time, time_series, label=name, **kwargs)
     plt.legend()
     plt.show()
