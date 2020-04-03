@@ -139,6 +139,7 @@ filtered_9_12 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_fre
 min_freq = 1 / (365*86400*50)
 max_freq = 1 / (365*86400*100)
 filtered_50_100 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
+plt.figure(figsize=(20,10))
 plt.plot(global_mean_ts_r1_anom[:300], label="signal")
 plt.plot(filtered_9_12[:300], label="Filter 9-12 years", linestyle="-", linewidth=0.5)
 plt.plot(filtered_50_100[:300], label="Filter 50-100 years", linestyle="-", linewidth=0.5)
@@ -166,7 +167,7 @@ plt.plot(filtered_50_100[:300], label="Filter 50-100 years", linestyle="-", line
 plt.legend()
 
 
-# Make power spectra for different zones of filtered data
+# Make power spectra for different zones of filtered temp anomaly
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # define min and max frequency in years
