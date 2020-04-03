@@ -62,6 +62,13 @@ dip = np.argwhere(classes==np.argmin(kmeans.cluster_centers_))
 dipinyear = list(int(timelist[i][0]/10000) for i in dip)
 len(dipinyear)
 
+# -----------------------------------------------------------------------------
+
+# TRY THIS GIT STUFF WITH THIS LINE
+
+# -----------------------------------------------------------------------------
+
+
 shortlistedtimeseries = list(timelist[i][0] for i in dip)
 
 #fourth column to group locations:

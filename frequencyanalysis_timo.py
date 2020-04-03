@@ -136,15 +136,15 @@ frequency = fftpack.fftfreq(len_input, time_step_size)
 min_freq = 1 / (365*86400*9)
 max_freq = 1 / (365*86400*12)
 filtered_9_12 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
-min_freq = 1 / (365*86400*50)
-max_freq = 1 / (365*86400*100)
-filtered_50_100 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
+min_freq = 1 / (365*86400*5)
+max_freq = 1 / (365*86400*1000)
+filtered_5_1000 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
 plt.figure(figsize=(20,10))
-plt.plot(global_mean_ts_r1_anom[:300], label="signal")
-plt.plot(filtered_9_12[:300], label="Filter 9-12 years", linestyle="-", linewidth=0.5)
-plt.plot(filtered_50_100[:300], label="Filter 50-100 years", linestyle="-", linewidth=0.5)
+plt.plot(global_mean_ts_r1_anom[:1000], label="signal")
+plt.plot(filtered_9_12[:1000], label="Filter 9-12 years", linestyle="-", linewidth=0.5)
+plt.plot(filtered_5_1000[:1000], label="Filter 5-1000 years", linestyle="-", linewidth=0.5)
 plt.legend()
-
+plt.savefig("frequencyanalysis_output/t2m_r1_filtered.png", dpi=300)
 # filter out the solar activity: or a frequency of x years from temp
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
