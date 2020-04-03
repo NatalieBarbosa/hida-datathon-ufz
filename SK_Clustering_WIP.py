@@ -63,7 +63,7 @@ dipinyear = list(int(timelist[i][0]/10000) for i in dip)
 len(dipinyear)
 
 # -----------------------------------------------------------------------------
-# Apply a filter to the 
+# Apply a filter to the
 # -----------------------------------------------------------------------------
 from
 
