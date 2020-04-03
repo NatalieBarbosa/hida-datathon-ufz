@@ -10,6 +10,9 @@ from scipy.signal import butter, lfilter
 def butter_bandstop_filter(data, lowcut, highcut, fs, order):
     """
     Filters a specific range of frequencies from the signal.
+    NOTE:
+        - Not yet verified it it works correctly!
+        - Seems to work better for the anomalies!
 
     Parameters
     ----------

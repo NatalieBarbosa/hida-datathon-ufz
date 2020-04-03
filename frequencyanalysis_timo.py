@@ -77,6 +77,9 @@ np.shape(tempslice_r1_mean)
 
 frequency, spectrum = power_spectrum(tempslice_r1_mean, tempslice_r1_mean, time_step_size, method="scipyperio", o_i="i")
 
+# Make power spectra for different zones
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define a list of markevery cases to plot
 cases = ["-90 - -70", "-70 - -50", "-50 - -30", "-30 - -10", "-10 - 10", "10 - 30", "30 - 50", "50 - 70", "70 - 90"]
 cases_u = [-70, -50, -30, -10, 10, 30, 50, 70, 90]
@@ -117,7 +120,11 @@ for ax, case, case_l, case_u in zip(axs, cases, cases_l, cases_u):
 #ax.set_title("Power Spectral Density of T2m for R1 model. \n Aggregated for different latitudes")
 plt.savefig(path + "/R2_R1_temp_spectral_density.png", dpi=300)
 
-## filter out the solar activity: or a frequency of x years
+
+
+# filter out the solar activity: or a frequency of x years from anomaly temp
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 global_mean_ts_r1 = np.mean(temp_r1, axis=(1,2))
 global_mean_ts_r1_anom = global_mean_ts_r1 - np.mean(global_mean_ts_r1)
 
@@ -137,9 +144,95 @@ plt.plot(filtered_9_12[:300], label="Filter 9-12 years", linestyle="-", linewidt
 plt.plot(filtered_50_100[:300], label="Filter 50-100 years", linestyle="-", linewidth=0.5)
 plt.legend()
 
-global_mean_ts_r1_anom_filtered = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=5)
-plt.plot(global_mean_ts_r1_anom)
-plt.plot(global_mean_ts_r1_anom_filtered)
+# filter out the solar activity: or a frequency of x years from temp
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+global_mean_ts_r1 = np.mean(temp_r1, axis=(1,2))
+
+spectrum = fftpack.fft(global_mean_ts_r1)
+len_input = len(global_mean_ts_r1)
+frequency = fftpack.fftfreq(len_input, time_step_size)
+
+# define min and max frequency in years
+min_freq = 1 / (365*86400*9)
+max_freq = 1 / (365*86400*12)
+filtered_9_12 = butter_bandstop_filter(global_mean_ts_r1, max_freq, min_freq, 1/time_step_size, order=1)
+min_freq = 1 / (365*86400*50)
+max_freq = 1 / (365*86400*100)
+filtered_50_100 = butter_bandstop_filter(global_mean_ts_r1, max_freq, min_freq, 1/time_step_size, order=1)
+plt.plot(global_mean_ts_r1[:300], label="signal")
+plt.plot(filtered_9_12[:300], label="Filter 9-12 years", linestyle="-", linewidth=0.5)
+plt.plot(filtered_50_100[:300], label="Filter 50-100 years", linestyle="-", linewidth=0.5)
+plt.legend()
+
+
+# Make power spectra for different zones of filtered data
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# define min and max frequency in years
+min_freq = 1 / (365*86400*9)
+max_freq = 1 / (365*86400*12)
+# define a list of markevery cases to plot
+cases = ["-90 - -70", "-70 - -50", "-50 - -30", "-30 - -10", "-10 - 10", "10 - 30", "30 - 50", "50 - 70", "70 - 90"]
+cases_u = [-70, -50, -30, -10, 10, 30, 50, 70, 90]
+cases_l = [-90, -70, -50, -30, -10, 10, 30, 50, 70]
+# define the figure size and grid layout properties
+figsize = (10, 9)
+cols = 2
+rows = len(cases) // cols + 1
+# define the data for cartesian plots
+delta = 0.11
+
+def trim_axs(axs, N):
+    """
+    Reduce *axs* to *N* Axes. All further Axes are removed from the figure.
+    """
+    axs = axs.flat
+    for ax in axs[N:]:
+        ax.remove()
+    return axs[:N]
+
+axs = plt.figure(figsize=figsize, constrained_layout=True).subplots(rows, cols)
+axs = trim_axs(axs, len(cases))
+for ax, case, case_l, case_u in zip(axs, cases, cases_l, cases_u):
+    ax.set_title('latitude band ' + str(case) + ' degree')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_ylabel("Spectral Power")
+    ax.set_xlabel("Frequency [Hz]")
+    tempslice_r1 = temp_r1[:, (lat > case_l) & (lat < case_u), :]
+    tempslice_r1_mean = np.mean(tempslice_r1, axis=(1,2))
+    tempslice_r2 = temp_r2[:, (lat > case_l) & (lat < case_u), :]
+    tempslice_r2_mean = np.mean(tempslice_r2, axis=(1,2))
+    # filter the signal:
+    tempslice_filtered = butter_bandstop_filter(tempslice_r2_mean, max_freq, min_freq, 1/time_step_size, order=1)
+                         #butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
+    frequency, spectrum = power_spectrum(tempslice_filtered, tempslice_filtered, time_step_size, method="scipyperio", o_i="i")
+    ax.plot(frequency, spectrum, ls='-', ms=4)
+    #ax.set_ylim(1e-3, 1e3)
+#ax.set_title("Power Spectral Density of T2m for R1 model. \n Aggregated for different latitudes")
+plt.savefig(path + "/R2_temp_spectral_density_filtered_9_12.png", dpi=300)
+
+plt.plot(tempslice_filtered, label="filtered")
+plt.plot(tempslice_r2_mean, label="signal")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# global_mean_ts_r1_anom_filtered = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=5)
+# plt.plot(global_mean_ts_r1_anom)
+# plt.plot(global_mean_ts_r1_anom_filtered)
 
 
 
