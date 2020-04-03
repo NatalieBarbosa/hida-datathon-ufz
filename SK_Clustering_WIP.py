@@ -83,8 +83,8 @@ df_South_temp = df_r1[(df_r1.lat>=-60) & (df_r1.lat<-30)]
 df_South_polar = df_r1[df_r1.lat<-60]
 
 #Taking snapshots of years of interest: this needs to be broadened to consider the 5 year rolling window I think
-kmeans = KMeans(n_clusters = 3)
-for t in shortlistedtimeseries[:5]:
+kmeans = KMeans(n_clusters = 5)
+for t in shortlistedtimeseries:
     Y = df_r1_time[df_r1_time['time']==t]
     series = Y["Var"]
     X = series.to_numpy().reshape(-1,1)
@@ -96,7 +96,9 @@ for t in shortlistedtimeseries[:5]:
     Y["labels"] = classes
     Y["plotlabels"] = kmeans.cluster_centers_[Y["labels"]] #To label the location with the corresponding cluster centroid
 #    print(kmeans.cluster_centers_)
-    plt.figure()
-    mglearn.discrete_scatter(Y['lon'], Y['lat'], Y["plotlabels"], markers='o')
+    plt.figure(figsize=[10,5])
+    mglearn.discrete_scatter(Y['lon'], Y['lat'], Y["plotlabels"], markers='o', s = 3)
     plt.title("Year: "+str(int(t/10000)))
     plt.legend()
+    picname = "D:\HIDA-Datathon-UFZ\hida-datathon-ufz\clustering_images\geo_clustering_at_year_"+str(int(t/10000))+".png"
+    plt.savefig(picname, dpi = 300)
