@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.fftpack as fftpack
 import scipy.signal as signal
+from frequencyanalysis.filter import butter_bandstop_filter
 
 # path for output plot
 path = "/Users/houben/phd/hackathons/hida_datathon/repos/hida-datathon-ufz/frequencyanalysis_output"
@@ -125,13 +126,17 @@ len_input = len(global_mean_ts_r1_anom)
 frequency = fftpack.fftfreq(len_input, time_step_size)
 
 # define min and max frequency in years
-min_freq = 1 / (365*86400*5)
+min_freq = 1 / (365*86400*9)
 max_freq = 1 / (365*86400*12)
 
 
 
+filtered = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
+plt.plot(global_mean_ts_r1_anom)
+plt.plot(filtered)
+
+
 # Bandstop filter - Does not work
-from scipy.signal import butter, lfilter
 def butter_bandstop(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
     low = lowcut / nyq
