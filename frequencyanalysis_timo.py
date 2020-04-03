@@ -128,50 +128,37 @@ frequency = fftpack.fftfreq(len_input, time_step_size)
 # define min and max frequency in years
 min_freq = 1 / (365*86400*9)
 max_freq = 1 / (365*86400*12)
-
-
-
-filtered = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
-plt.plot(global_mean_ts_r1_anom)
-plt.plot(filtered)
-
-
-# Bandstop filter - Does not work
-def butter_bandstop(lowcut, highcut, fs, order=5):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
-    b, a = butter(order, [low, high], btype='highpass')
-    return b, a
-
-def butter_bandstop_filter(data, lowcut, highcut, fs, order=5):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
+filtered_9_12 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
+min_freq = 1 / (365*86400*50)
+max_freq = 1 / (365*86400*100)
+filtered_50_100 = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=1)
+plt.plot(global_mean_ts_r1_anom[:300], label="signal")
+plt.plot(filtered_9_12[:300], label="Filter 9-12 years", linestyle="-", linewidth=0.5)
+plt.plot(filtered_50_100[:300], label="Filter 50-100 years", linestyle="-", linewidth=0.5)
+plt.legend()
 
 global_mean_ts_r1_anom_filtered = butter_bandstop_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=5)
 plt.plot(global_mean_ts_r1_anom)
 plt.plot(global_mean_ts_r1_anom_filtered)
 
 
-# Bandpass filter - works (I think)
-from scipy.signal import butter, lfilter
-def butter_bandpass(lowcut, highcut, fs, order=5):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
-    b, a = butter(order, [low, high], btype='band')
-    return b, a
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
 
-global_mean_ts_r1_anom_filtered = butter_bandpass_filter(global_mean_ts_r1_anom, max_freq, min_freq, 1/time_step_size, order=5)
-plt.plot(global_mean_ts_r1_anom)
-plt.plot(global_mean_ts_r1_anom_filtered)
 
+
+#
+# # Bandstop filter - Does not work
+# def butter_bandstop(lowcut, highcut, fs, order=5):
+#     nyq = 0.5 * fs
+#     low = lowcut / nyq
+#     high = highcut / nyq
+#     b, a = butter(order, [low, high], btype='highpass')
+#     return b, a
+#
+# def butter_bandstop_filter(data, lowcut, highcut, fs, order=5):
+#     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+#     y = lfilter(b, a, data)
+#     return y
 
 
 # pop first value of frequency since it's zero and all negative frequencies

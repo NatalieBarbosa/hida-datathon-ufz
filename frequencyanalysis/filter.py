@@ -17,7 +17,7 @@ def butter_bandstop_filter(data, lowcut, highcut, fs, order):
     data : 1D-array
         Dataset
     lowcut : float
-        Lower frequency in Hz
+        Lower frequency in Hz. Ex.: 2 years = 1 / ( 365 * 86400 * 2) [Hz]
     highcut : float
         Higher frequency in Hz
     fs : float
@@ -33,4 +33,19 @@ def butter_bandstop_filter(data, lowcut, highcut, fs, order):
 
     i, u = butter(order, [low, high], btype='bandstop')
     y = lfilter(i, u, data)
+    return y
+
+
+
+
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
     return y
