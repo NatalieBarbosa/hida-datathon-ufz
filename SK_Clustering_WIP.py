@@ -12,10 +12,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import mglearn
 
-say_hello()
+#say_hello()
 
 # set a path to the directory containing the data
-directory = "D:\HIDA-Datathon-UFZ\hida-datathon-ufz\data"
+directory = "/Users/houben/phd/hackathons/hida_datathon/data/MyChallengePaleo"
 # set the file names
 filename_temp_data_r1 = "T2m_R1_ym_1stMill.nc"
 filename_temp_data_r2 = "T2m_R2_ym_1stMill.nc"
@@ -48,6 +48,7 @@ from sklearn.cluster import KMeans
 kmeans = KMeans(n_clusters = 5)
 X = Var_frommean.to_numpy().reshape(-1,1)
 kmeans.fit(X)
+kmeans.cluster_centers_
 print("Cluster memberships:\n{}".format(kmeans.labels_))
 #Assign classes to each data point based on the model
 classes = kmeans.predict(X)
@@ -60,6 +61,13 @@ dip = np.argwhere(classes==np.argmin(kmeans.cluster_centers_))
 #look for the years which have the biggest dips
 dipinyear = list(int(timelist[i][0]/10000) for i in dip)
 len(dipinyear)
+
+# -----------------------------------------------------------------------------
+
+# TRY THIS GIT STUFF WITH THIS LINE
+
+# -----------------------------------------------------------------------------
+
 
 shortlistedtimeseries = list(timelist[i][0] for i in dip)
 
@@ -102,3 +110,4 @@ for t in shortlistedtimeseries:
     plt.legend()
     picname = "D:\HIDA-Datathon-UFZ\hida-datathon-ufz\clustering_images\geo_clustering_at_year_"+str(int(t/10000))+".png"
     plt.savefig(picname, dpi = 300)
+
