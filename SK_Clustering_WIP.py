@@ -65,8 +65,25 @@ len(dipinyear)
 # -----------------------------------------------------------------------------
 # Apply a filter to the
 # -----------------------------------------------------------------------------
-from
+from frequencyanalysis.filter import butter_bandstop_filter
+#Initialize the algorithm and fit it with the data
+kmeans = KMeans(n_clusters = 5)
 
+X = Var_frommean.to_numpy().reshape(-1,1)
+kmeans.fit(X)
+kmeans.cluster_centers_
+print("Cluster memberships:\n{}".format(kmeans.labels_))
+#Assign classes to each data point based on the model
+classes = kmeans.predict(X)
+#Inspect the centroids of the clusters
+print(kmeans.cluster_centers_)
+#Shortcut to see/visualize the datapoints and range of each cluster
+mglearn.discrete_scatter(X, X, kmeans.labels_, markers='o')
+#Volcanic activity is expected to have the maximum impact out of all forcings so look for the time points which are in the cluster associated with the lowest centroid
+dip = np.argwhere(classes==np.argmin(kmeans.cluster_centers_))
+#look for the years which have the biggest dips
+dipinyear = list(int(timelist[i][0]/10000) for i in dip)
+len(dipinyear)
 
 # -----------------------------------------------------------------------------
 
